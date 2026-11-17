@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#241a3b">
+<title>Safety Band</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#241a3b; --paper:#f2eff8; --surface:#ffffff; --rose:#d4245f; --teal:#0e7c7b;
+  --muted:#6d6584; --line:#ddd6ec;
+  --font:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.45;
+  padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+[hidden]{display:none !important}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--rose);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto}
+
+/* ---------- PIN screen ---------- */
+#lock{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--ink);color:#fff}
+#lock .box{width:100%;max-width:340px}
+#lock h1{font-size:40px;line-height:1.05;margin:0 0 8px;font-weight:800;letter-spacing:-.02em}
+#lock p{margin:0 0 20px;color:#c9c0e0}
+#lock input{width:100%;padding:14px 16px;margin-bottom:10px;border-radius:14px;border:2px solid #4b3d72;background:#2f2350;color:#fff;font-size:22px;letter-spacing:.3em;text-align:center}
+#lock .msg{min-height:22px;color:#ff9fbd;margin:4px 0 8px}
+#lock .link{background:none;border:0;color:#c9c0e0;text-decoration:underline;margin-top:14px;padding:6px 0;cursor:pointer}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-block;border:0;border-radius:12px;padding:12px 18px;background:var(--ink);color:#fff;font-weight:600;cursor:pointer;text-decoration:none;text-align:center}
+.btn.rose{background:var(--rose)}
+.btn.ghost{background:transparent;border:2px solid var(--ink);color:var(--ink)}
+.btn.light{background:#fff;color:var(--ink)}
+.btn.block{display:block;width:100%}
+
+/* ---------- hero ---------- */
+.hero{background:var(--ink);color:#fff;padding:calc(18px + env(safe-area-inset-top,0px)) 20px 22px;border-radius:0 0 30px 30px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.01em}
+.pill{font-size:13px;padding:5px 12px;border-radius:99px;background:#3a2d5c;color:#d8d0ee}
+.pill.on{background:#0e7c7b;color:#fff}
+.pill.warn{background:#8a5a12;color:#fff}
+.bpmrow{display:flex;align-items:flex-end;gap:14px;margin-top:20px}
+.bpm{font-size:clamp(84px,26vw,128px);line-height:.85;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums;font-optical-sizing:auto}
+.bpm.bad{color:#ff7aa3}
+.bpmlabel{padding-bottom:10px;color:#c9c0e0;max-width:9em}
+.pulse{width:14px;height:14px;border-radius:50%;background:var(--rose);margin:0 0 14px auto;position:relative;flex:none}
+.pulse::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--rose);animation:beat var(--beat,1s) ease-out infinite}
+.pulse.off{background:#4b3d72}.pulse.off::after{display:none}
+@keyframes beat{from{transform:scale(1);opacity:.7}to{transform:scale(3.2);opacity:0}}
+@media (prefers-reduced-motion:reduce){.pulse::after{animation:none}}
+#trace{display:block;width:100%;height:120px;margin-top:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;font-size:14px;color:#c9c0e0}
+.chips span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:#6d5e96}
+.chips span.ok::before{background:#4fd1c5}
+.chips span.bad::before{background:#ff7aa3}
+#connectBtn{margin-top:18px}
+
+/* ---------- sections ---------- */
+section.pane{padding:22px 20px 0}
+h2{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+h3{font-size:17px;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 14px}
+.empty{color:var(--muted)}
+.banner{margin:16px 20px 0;padding:14px 16px;border-radius:16px;font-weight:600}
+.banner.pre{border:2px solid var(--rose);color:var(--rose);background:#fff}
+.banner.sos{background:var(--rose);color:#fff}
+.where{background:var(--surface);border-radius:20px;padding:16px;margin-top:6px}
+.coords{font-size:20px;font-variant-numeric:tabular-nums;margin:2px 0 2px}
+.src{color:var(--muted);margin:0 0 12px}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.route{margin-top:6px}
+.route ol{list-style:none;margin:10px 0 14px;padding:0 0 0 18px;border-left:3px solid var(--line)}
+.route li{position:relative;display:flex;justify-content:space-between;gap:10px;padding:8px 0}
+.route li::before{content:"";position:absolute;left:-26px;top:14px;width:11px;height:11px;border-radius:50%;background:var(--line);border:2px solid var(--paper)}
+.route li.ok::before{background:var(--teal)}
+.route li.fail::before{background:var(--rose)}
+.route li.pending::before{background:#e0a21b}
+.route li b{font-weight:600;color:var(--muted);white-space:nowrap}
+.route li.ok b{color:var(--teal)}.route li.fail b{color:var(--rose)}
+.hist{border-top:1px solid var(--line);padding:14px 0}
+.hist:first-of-type{border-top:0}
+.hist .t{color:var(--muted);font-size:14px}
+.hist a{color:var(--ink)}
+label{display:block;font-weight:600;margin:14px 0 6px}
+input.f{width:100%;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:#fff}
+input.f:focus{border-color:var(--ink);outline:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.note{font-size:14px;color:var(--muted);margin:6px 0 0}
+.gap{height:12px}
+
+/* ---------- tab bar ---------- */
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:6px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:rgba(242,239,248,.94);backdrop-filter:blur(8px);border-top:1px solid var(--line)}
+nav button{flex:1;max-width:170px;border:0;background:transparent;padding:12px 0;border-radius:12px;font-weight:600;color:var(--muted);cursor:pointer}
+nav button[aria-selected="true"]{background:var(--ink);color:#fff}
+#toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:14px;max-width:90vw;z-index:9}
+</style>
+</head>
+<body>
+
+<!-- PIN screen -->
+<div id="lock">
+  <div class="box">
+    <h1 id="lockTitle">Enter PIN</h1>
+    <p id="lockHint">Enter your PIN to open the Safety Band app.</p>
+    <input id="lockPin" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="PIN">
+    <input id="lockPin2" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="repeat" aria-label="Repeat PIN" hidden>
+    <div class="msg" id="lockMsg" role="alert"></div>
+    <button class="btn light block" id="lockBtn">Unlock</button>
+    <button class="link" id="forgot">Forgot PIN?</button>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app" hidden>
+  <div class="wrap">
+    <div class="hero">
+      <div class="top">
+        <h1>Safety Band</h1>
+        <span class="pill" id="pill">Not connected</span>
+      </div>
+      <div class="bpmrow">
+        <div class="bpm" id="bpm">--</div>
+        <div class="bpmlabel" id="bpmLabel">beats per minute</div>
+        <div class="pulse off" id="pulse"></div>
+      </div>
+      <canvas id="trace" aria-label="Heart rate over the last 90 seconds"></canvas>
+      <div class="chips" id="chips"></div>
+      <button class="btn light block" id="connectBtn">Connect to band</button>
+    </div>
+
+    <div class="banner" id="banner" hidden></div>
+
+    <!-- Live -->
+    <section class="pane" id="tab-live">
+      <h2>Where she is</h2>
+      <p class="sub" id="locSub">Waiting for a location from the band or this phone.</p>
+      <div class="where">
+        <div class="coords" id="coords">No location yet</div>
+        <p class="src" id="src"></p>
+        <div class="row">
+          <a class="btn" id="mapBtn" href="#" target="_blank" rel="noopener" hidden>Open in Maps</a>
+          <button class="btn ghost" id="tgNow">Send to Telegram</button>
+        </div>
+      </div>
+      <div class="gap"></div>
+      <h2>Last alert</h2>
+      <div class="route" id="route"></div>
+    </section>
+
+    <!-- Alerts -->
+    <section class="pane" id="tab-alerts" hidden>
+      <h2>History</h2>
+      <p class="sub">Everything the band has sent, saved on this phone.</p>
+      <div id="hist"></div>
+      <button class="btn ghost" id="clearHist">Clear history</button>
+    </section>
+
+    <!-- Setup -->
+    <section class="pane" id="tab-setup" hidden>
+      <h2>Emergency numbers</h2>
+      <p class="sub">Every number gets the SMS. Number 1 also gets the call. Until you save here, the band uses the number built into its code.</p>
+      <label for="n0">Number 1</label><input class="f" id="n0" type="tel" placeholder="+918637505062">
+      <label for="n1">Number 2</label><input class="f" id="n1" type="tel" placeholder="+91…">
+      <label for="n2">Number 3</label><input class="f" id="n2" type="tel" placeholder="+91…">
+      <label for="n3">Number 4</label><input class="f" id="n3" type="tel" placeholder="+91…">
+
+      <div class="gap"></div>
+      <h2>Heart rate alert</h2>
+      <p class="sub">The band alerts when the rate stays outside this range for 10 seconds.</p>
+      <div class="two">
+        <div><label for="hrLow">Lowest (bpm)</label><input class="f" id="hrLow" type="number" inputmode="numeric"></div>
+        <div><label for="hrHigh">Highest (bpm)</label><input class="f" id="hrHigh" type="number" inputmode="numeric"></div>
+      </div>
+
+      <div class="gap"></div>
+      <h2>Telegram</h2>
+      <p class="sub">The phone sends the message and a map pin when an alert arrives. These stay on this phone only.</p>
+      <label for="tgToken">Bot token</label><input class="f" id="tgToken" type="password" autocomplete="off">
+      <label for="tgChat">Chat ID</label><input class="f" id="tgChat" type="text" inputmode="text" autocomplete="off">
+      <p class="note">Get the token from @BotFather. Use a group chat ID to alert several people at once.</p>
+
+      <div class="gap"></div>
+      <button class="btn rose block" id="saveSettings">Save and send to band</button>
+      <div class="gap"></div>
+      <div class="row">
+        <button class="btn ghost" id="tgTest">Test Telegram</button>
+        <button class="btn ghost" id="sosTest">Send test SOS</button>
+        <button class="btn ghost" id="lockNow">Lock app</button>
+      </div>
+      <p class="note">Test SOS sends real SMS messages and makes a real call.</p>
+    </section>
+  </div>
+
+  <nav role="tablist" aria-label="Sections">
+    <button role="tab" aria-selected="true" data-tab="live">Live</button>
+    <button role="tab" aria-selected="false" data-tab="alerts">Alerts</button>
+    <button role="tab" aria-selected="false" data-tab="setup">Setup</button>
+  </nav>
+</div>
+<div id="toast" hidden></div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------- constants ----------
+  const SERVICE = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+  const UUID = n => "6e40000" + n + "-b5a3-f393-e0a9-e50e24dcca9e";
+  const VITALS = UUID(2), LOC = UUID(3), STATUS = UUID(4), CONFIG = UUID(5);
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+  function load(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage blocked */ } }
+
+  // ---------- state ----------
+  let settings = Object.assign({ numbers: ["", "", "", ""], tgToken: "", tgChat: "", hrHigh: 140, hrLow: 40, pin: "", configured: false }, load("sb_settings", {}));
+  let history = load("sb_history", []);
+  const band = { bpm: 0, finger: false, g: 1, mpu: false, max: false, loc: null };
+  let phone = null;
+  let cur = null;                  // alert being shown
+  let device = null, chCfg = null, retries = 0, bannerTimer = null;
+  const series = [];
+
+  // ---------- small helpers ----------
+  function toast(msg) {
+    const t = $("toast"); t.textContent = msg; t.hidden = false;
+    clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 3800);
+  }
+  const mapLink = l => "https://maps.google.com/?q=" + l.lat.toFixed(6) + "," + l.lng.toFixed(6);
+  const nowText = () => new Date().toLocaleString([], { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  const isConnected = () => !!(device && device.gatt && device.gatt.connected);
+
+  // ---------- PIN lock ----------
+  async function sha(s) {
+    if (window.crypto && crypto.subtle) {
+      const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sb:" + s));
+      return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, "0")).join("");
+    }
+    return "x" + btoa(s);
+  }
+  function initLock() {
+    $("lockPin").value = ""; $("lockPin2").value = ""; $("lockMsg").textContent = "";
+    if (!settings.pin) {
+      $("lockTitle").textContent = "Create a PIN";
+      $("lockHint").textContent = "4 to 6 digits. It locks this app on this phone.";
+      $("lockPin2").hidden = false; $("lockBtn").textContent = "Save PIN";
+    } else {
+      $("lockTitle").textContent = "Enter PIN";
+      $("lockHint").textContent = "Enter your PIN to open the Safety Band app.";
+      $("lockPin2").hidden = true; $("lockBtn").textContent = "Unlock";
+    }
+  }
+  $("lockBtn").onclick = async () => {
+    const p = $("lockPin").value.trim(), msg = $("lockMsg");
+    if (!/^\d{4,6}$/.test(p)) { msg.textContent = "Use 4 to 6 digits."; return; }
+    if (!settings.pin) {
+      if (p !== $("lockPin2").value.trim()) { msg.textContent = "The two PINs do not match."; return; }
+      settings.pin = await sha(p); save("sb_settings", settings); unlock();
+    } else if ((await sha(p)) === settings.pin) {
+      unlock();
+    } else {
+      msg.textContent = "Wrong PIN. Try again."; $("lockPin").value = "";
+    }
+  };
+  $("lockPin").addEventListener("keydown", e => { if (e.key === "Enter") $("lockBtn").click(); });
+  $("forgot").onclick = () => {
+    if (confirm("This clears the PIN, saved numbers and history on this phone. Continue?")) {
+      try { localStorage.clear(); } catch (e) { /* ignore */ }
+      location.reload();
+    }
+  };
+  $("lockNow").onclick = () => { $("app").hidden = true; $("lock").hidden = false; initLock(); };
+
+  function unlock() {
+    $("lock").hidden = true; $("app").hidden = false;
+    fillSettings(); renderAll(); startPhoneGps();
+  }
+
+  // ---------- tabs ----------
+  document.querySelectorAll("nav button").forEach(b => {
+    b.onclick = () => {
+      document.querySelectorAll("nav button").forEach(x => x.setAttribute("aria-selected", String(x === b)));
+      ["live", "alerts", "setup"].forEach(t => { $("tab-" + t).hidden = (t !== b.dataset.tab); });
+      window.scrollTo(0, 0);
+    };
+  });
+
+  // ---------- phone location ----------
+  function startPhoneGps() {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.watchPosition(
+      p => { phone = { lat: p.coords.latitude, lng: p.coords.longitude, t: Date.now() }; renderLoc(); },
+      () => { phone = null; },
+      { enableHighAccuracy: true, maximumAge: 15000, timeout: 20000 }
+    );
+  }
+  function bestLocation() {
+    if (band.loc && band.loc.live) return { lat: band.loc.lat, lng: band.loc.lng, src: "Band GPS, live" };
+    if (phone && Date.now() - phone.t < 120000) return { lat: phone.lat, lng: phone.lng, src: "This phone’s GPS" };
+    if (band.loc) return { lat: band.loc.lat, lng: band.loc.lng, src: "Band GPS, last saved" };
+    return null;
+  }
+
+  // ---------- rendering ----------
+  function setConn(s) {
+    const pill = $("pill"), btn = $("connectBtn");
+    pill.className = "pill";
+    if (s === "connected") { pill.textContent = "Connected to band"; pill.classList.add("on"); btn.hidden = true; }
+    else if (s === "connecting") { pill.textContent = "Connecting…"; pill.classList.add("warn"); btn.hidden = true; }
+    else if (s === "lost") { pill.textContent = "Connection lost, retrying"; pill.classList.add("warn"); btn.hidden = false; btn.textContent = "Connect again"; }
+    else { pill.textContent = "Not connected"; btn.hidden = false; btn.textContent = "Connect to band"; }
+    if (s !== "connected") { band.bpm = 0; renderVitals(); }
+  }
+
+  function renderVitals() {
+    const bad = band.bpm > 0 && (band.bpm > settings.hrHigh || band.bpm < settings.hrLow);
+    $("bpm").textContent = band.bpm > 0 ? band.bpm : "--";
+    $("bpm").classList.toggle("bad", bad);
+    $("bpmLabel").textContent = !isConnected() ? "connect to the band to see it"
+      : !band.max ? "heart sensor not found"
+      : !band.finger ? "place a finger on the sensor"
+      : band.bpm > 0 ? (bad ? "outside the safe range" : "beats per minute") : "measuring, hold still";
+    const p = $("pulse");
+    if (band.bpm > 0) { p.classList.remove("off"); p.style.setProperty("--beat", (60 / band.bpm).toFixed(2) + "s"); }
+    else p.classList.add("off");
+    const chip = (ok, text) => "<span class=\"" + (ok ? "ok" : "bad") + "\">" + text + "</span>";
+    $("chips").innerHTML = isConnected()
+      ? chip(band.max, band.max ? "Heart sensor" : "Heart sensor missing") + chip(band.mpu, band.mpu ? "Motion sensor" : "Motion sensor missing")
+      : "";
+  }
+
+  function drawTrace() {
+    const c = $("trace"), r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    if (!r.width) return;
+    c.width = r.width * dpr; c.height = r.height * dpr;
+    const x = c.getContext("2d"); x.scale(dpr, dpr);
+    const w = r.width, h = r.height;
+    const lo = Math.min(40, settings.hrLow - 8), hi = Math.max(160, settings.hrHigh + 12);
+    const Y = v => h - 8 - ((v - lo) / (hi - lo)) * (h - 16);
+    x.font = "12px system-ui, sans-serif"; x.lineWidth = 1;
+    [[settings.hrHigh, "alert above " + settings.hrHigh], [settings.hrLow, "alert below " + settings.hrLow]].forEach(a => {
+      x.setLineDash([4, 5]); x.strokeStyle = "rgba(255,255,255,.3)";
+      x.beginPath(); x.moveTo(0, Y(a[0])); x.lineTo(w, Y(a[0])); x.stroke();
+      x.setLineDash([]); x.fillStyle = "rgba(255,255,255,.6)"; x.fillText(a[1], 2, Y(a[0]) - 4);
+    });
+    if (series.length < 2) return;
+    const step = w / 89;
+    x.lineWidth = 2.5; x.lineJoin = "round"; x.strokeStyle = "#fff"; x.beginPath();
+    series.forEach((v, i) => {
+      const px = w - (series.length - 1 - i) * step, py = Y(v);
+      if (i) x.lineTo(px, py); else x.moveTo(px, py);
+    });
+    x.stroke();
+    x.fillStyle = "#d4245f"; x.beginPath(); x.arc(w - 4, Y(series[series.length - 1]), 5, 0, 7); x.fill();
+  }
+
+  function renderLoc() {
+    const b = bestLocation();
+    if (!b) {
+      $("coords").textContent = "No location yet";
+      $("src").textContent = "Take the band outside once, or allow location for this page.";
+      $("mapBtn").hidden = true; return;
+    }
+    $("coords").textContent = b.lat.toFixed(5) + ", " + b.lng.toFixed(5);
+    $("src").textContent = "Source: " + b.src;
+    $("mapBtn").href = mapLink(b); $("mapBtn").hidden = false;
+  }
+
+  function alertText(a) {
+    return "SOS! " + a.reason + "\nHeart rate: " + (a.bpm > 0 ? a.bpm + " BPM" : "not measured") +
+      "\nLocation: " + (a.loc ? "https://maps.google.com/?q=" + a.loc.lat.toFixed(6) + "," + a.loc.lng.toFixed(6) + " (" + a.loc.src + ")" : "not available") +
+      "\nTime: " + a.time;
+  }
+
+  function renderRoute() {
+    const el = $("route");
+    if (!cur) { el.innerHTML = "<p class=\"empty\">No alert yet. When the band sends one, every step shows here.</p>"; return; }
+    const label = { ok: "Done", fail: "Failed", skip: "Skipped", pending: "Sending" };
+    let html = "<h3>" + esc(cur.reason) + ", " + esc(cur.time) + "</h3><ol>" +
+      cur.steps.map(s => "<li class=\"" + s.s + "\"><span>" + esc(s.t) + "</span><b>" + label[s.s] + "</b></li>").join("") + "</ol>";
+    const first = (settings.numbers.find(n => n) || "").replace(/\D/g, "");
+    html += "<a class=\"btn ghost\" target=\"_blank\" rel=\"noopener\" href=\"https://wa.me/" + first + "?text=" + encodeURIComponent(alertText(cur)) + "\">Share on WhatsApp</a>";
+    el.innerHTML = html;
+  }
+
+  function renderHistory() {
+    const el = $("hist");
+    if (!history.length) { el.innerHTML = "<p class=\"empty\">No alerts yet.</p>"; return; }
+    el.innerHTML = history.map(h =>
+      "<div class=\"hist\"><div><b>" + esc(h.reason) + "</b> <span class=\"t\">" + esc(h.time) + "</span></div>" +
+      "<div>Heart rate: " + (h.bpm > 0 ? h.bpm + " bpm" : "not measured") + "</div>" +
+      "<div>" + (h.loc ? "<a target=\"_blank\" rel=\"noopener\" href=\"" + mapLink(h.loc) + "\">" + esc(h.loc.src) + "</a>" : "No location") + "</div>" +
+      "<div class=\"t\">" + h.steps.map(s => esc(s.t) + ": " + s.s).join(" · ") + "</div></div>").join("");
+  }
+
+  function renderAll() { renderVitals(); drawTrace(); renderLoc(); renderRoute(); renderHistory(); }
+
+  // ---------- banner ----------
+  function banner(kind, text, autoHide) {
+    const b = $("banner"); clearTimeout(bannerTimer);
+    b.className = "banner " + kind; b.textContent = text; b.hidden = false;
+    if (autoHide) bannerTimer = setTimeout(() => { b.hidden = true; }, autoHide);
+  }
+
+  // ---------- alert flow ----------
+  function startAlert(reason) {
+    cur = { reason: reason, time: nowText(), bpm: band.bpm, loc: bestLocation(), steps: [{ t: "Band triggered (" + reason + ")", s: "ok" }] };
+    banner("sos", "Alert sent: " + reason + ". Contacting your emergency numbers.");
+    renderRoute();
+    sendTelegram(cur);
+  }
+  function step(label, state) {
+    if (!cur) return;
+    const ex = cur.steps.find(s => s.t === label);
+    if (ex) ex.s = state; else cur.steps.push({ t: label, s: state });
+    renderRoute();
+  }
+  function finishAlert() {
+    if (!cur) return;
+    history.unshift(JSON.parse(JSON.stringify(cur)));
+    history = history.slice(0, 100); save("sb_history", history);
+    renderHistory();
+    banner("sos", "Alert complete. See the steps below.", 12000);
+  }
+
+  async function sendTelegram(a, isTest) {
+    const label = "Telegram, sent by this phone";
+    if (!settings.tgToken || !settings.tgChat) {
+      if (isTest) toast("Add the bot token and chat ID in Setup first.");
+      else step(label, "skip");
+      return;
+    }
+    if (!isTest) step(label, "pending");
+    const base = "https://api.telegram.org/bot" + encodeURIComponent(settings.tgToken);
+    const chat = encodeURIComponent(settings.tgChat);
+    try {
+      const r = await fetch(base + "/sendMessage?chat_id=" + chat + "&text=" + encodeURIComponent(alertText(a)));
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.description || "Telegram refused the message");
+      if (a.loc) await fetch(base + "/sendLocation?chat_id=" + chat + "&latitude=" + a.loc.lat + "&longitude=" + a.loc.lng);
+      if (isTest) toast("Test message sent to Telegram."); else step(label, "ok");
+    } catch (e) {
+      if (isTest) toast("Telegram failed: " + e.message); else step(label, "fail");
+    }
+  }
+
+  // ---------- band messages ----------
+  function onVitals(s) {
+    const p = s.split(",");
+    band.bpm = +p[0] || 0; band.finger = p[1] === "1"; band.g = +p[2] || 1; band.mpu = p[3] === "1"; band.max = p[4] === "1";
+    if (band.bpm > 0) { series.push(band.bpm); if (series.length > 90) series.shift(); }
+    renderVitals(); drawTrace();
+  }
+  function onLoc(s) {
+    if (s[0] === "N") band.loc = null;
+    else { const c = s.slice(1).split(",").map(Number); band.loc = { lat: c[0], lng: c[1], live: s[0] === "L" }; }
+    renderLoc();
+  }
+  function onStatus(s) {
+    if (s.indexOf("PRE:") === 0) banner("pre", "Automatic alert in 10 seconds: " + s.slice(4) + ". Press the band button to cancel.");
+    else if (s === "CANCEL") { banner("pre", "Alert cancelled on the band.", 6000); }
+    else if (s.indexOf("SOS:") === 0) startAlert(s.slice(4));
+    else if (/^SMS\d:/.test(s)) {
+      const i = +s[3] - 1, ok = s.slice(5) === "OK", n = settings.numbers[i];
+      step("SMS from the band’s SIM to number " + (i + 1) + (n ? " (" + n + ")" : ""), ok ? "ok" : "fail");
+    }
+    else if (s === "CALL") step("Call from the band’s SIM to number 1", "ok");
+    else if (s === "DONE") finishAlert();
+  }
+
+  // ---------- Bluetooth ----------
+  const dec = dv => new TextDecoder().decode(dv);
+  async function writeCfg(str) {
+    const data = new TextEncoder().encode(str);
+    if (chCfg.writeValueWithResponse) await chCfg.writeValueWithResponse(data); else await chCfg.writeValue(data);
+  }
+  async function pushConfig() {
+    for (let i = 0; i < 4; i++) await writeCfg("N" + i + "," + (settings.numbers[i] || ""));
+    await writeCfg("H," + settings.hrHigh);
+    await writeCfg("L," + settings.hrLow);
+  }
+  async function openGatt() {
+    setConn("connecting");
+    const server = await device.gatt.connect();
+    const svc = await server.getPrimaryService(SERVICE);
+    const chV = await svc.getCharacteristic(VITALS), chL = await svc.getCharacteristic(LOC), chS = await svc.getCharacteristic(STATUS);
+    chCfg = await svc.getCharacteristic(CONFIG);
+    chV.addEventListener("characteristicvaluechanged", e => onVitals(dec(e.target.value)));
+    chL.addEventListener("characteristicvaluechanged", e => onLoc(dec(e.target.value)));
+    chS.addEventListener("characteristicvaluechanged", e => onStatus(dec(e.target.value)));
+    await chV.startNotifications(); await chL.startNotifications(); await chS.startNotifications();
+    setConn("connected");
+    if (settings.configured) { try { await pushConfig(); } catch (e) { toast("Could not send settings to the band."); } }
+  }
+  async function connectBand() {
+    if (!navigator.bluetooth) { toast("Bluetooth needs Chrome on Android, opened over HTTPS."); return; }
+    try {
+      device = await navigator.bluetooth.requestDevice({ filters: [{ services: [SERVICE] }] });
+      device.addEventListener("gattserverdisconnected", onDisconnected);
+      retries = 0;
+      await openGatt();
+    } catch (e) {
+      setConn(isConnected() ? "connected" : "off");
+      if (e.name !== "NotFoundError") toast("Could not connect: " + e.message);
+    }
+  }
+  function onDisconnected() {
+    setConn("lost");
+    if (retries >= 5) return;
+    retries++;
+    setTimeout(async () => {
+      try { await openGatt(); retries = 0; } catch (e) { onDisconnected(); }
+    }, 2500);
+  }
+  $("connectBtn").onclick = connectBand;
+
+  // ---------- settings ----------
+  function fillSettings() {
+    for (let i = 0; i < 4; i++) $("n" + i).value = settings.numbers[i] || "";
+    $("tgToken").value = settings.tgToken; $("tgChat").value = settings.tgChat;
+    $("hrHigh").value = settings.hrHigh; $("hrLow").value = settings.hrLow;
+  }
+  $("saveSettings").onclick = async () => {
+    const nums = [0, 1, 2, 3].map(i => $("n" + i).value.replace(/[\s-]/g, ""));
+    for (const n of nums) {
+      if (n && !/^\+\d{8,15}$/.test(n)) { toast("Numbers need the country code, like +918637505062."); return; }
+    }
+    if (nums.every(n => !n) && !confirm("With no numbers the band cannot send SMS or make calls. Save anyway?")) return;
+    const lo = clamp(+$("hrLow").value || 40, 30, 100), hi = clamp(+$("hrHigh").value || 140, 50, 220);
+    if (lo >= hi) { toast("The lowest rate must be below the highest."); return; }
+    settings.numbers = nums; settings.hrLow = lo; settings.hrHigh = hi;
+    settings.tgToken = $("tgToken").value.trim(); settings.tgChat = $("tgChat").value.trim();
+    settings.configured = true; save("sb_settings", settings);
+    fillSettings(); drawTrace(); renderVitals();
+    if (isConnected()) {
+      try { await pushConfig(); toast("Saved and sent to the band."); }
+      catch (e) { toast("Saved here, but the band did not accept it: " + e.message); }
+    } else toast("Saved. It goes to the band when you connect.");
+  };
+  $("tgTest").onclick = () => sendTelegram({ reason: "TEST", time: nowText(), bpm: band.bpm, loc: bestLocation() }, true);
+  $("tgNow").onclick = () => sendTelegram({ reason: "LOCATION SHARE", time: nowText(), bpm: band.bpm, loc: bestLocation() }, true);
+  $("sosTest").onclick = async () => {
+    if (!isConnected()) { toast("Connect to the band first."); return; }
+    if (!confirm("This sends real SMS messages and makes a real call from the band. Continue?")) return;
+    try { await writeCfg("SOS"); toast("Test SOS requested."); } catch (e) { toast("Could not reach the band: " + e.message); }
+  };
+  $("clearHist").onclick = () => { if (confirm("Clear all saved alerts on this phone?")) { history = []; save("sb_history", history); renderHistory(); } };
+
+  window.addEventListener("resize", drawTrace);
+  initLock();
+})();
+</script>
+</body>
+</html>
